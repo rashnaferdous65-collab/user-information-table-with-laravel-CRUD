@@ -47,45 +47,53 @@ class PostController extends Controller
 
     }
    
-    public function update($id, Request $request){
-    
-           $validated = $request->validate([
-        'name' => 'required',
+   public function update($id, Request $request)
+{
+    // Validate input
+    $data = $request->validate([
+        'name'        => 'required',
         'description' => 'required',
-        'image' => 'nullable',
+        'image'       => 'nullable',
     ]);
 
- 
+    // Find post
+    $post = Post::findOrFail($id);
 
+    // Update basic fields
+    $post->fill([
+        'name'        => $data['name'],
+        'description' => $data['description'],
+    ]);
 
-       //update Post
-         $post= Post::findOrFail($id);
-         $post->name = $request->name;
-         $post->description = $request->description;
-        
-          //update image
-    //$imageName = null; 
+    // Handle image upload if exists
     if ($request->hasFile('image')) {
-        $imageName = time().'.'.$request->image->extension();
+        $imageName = time() . '.' . $request->image->extension();
         $request->image->move(public_path('images'), $imageName);
-         $post->image = $imageName; 
+
+        $post->image = $imageName;
     }
-       
 
-          $post->save();
-  
-          return redirect()->route('home')->with('success', 'Your Post Has Been Upadated Successfully!');
-        
+    // Save changes
+    $post->save();
+
+    return redirect()
+        ->route('home')
+        ->with('success', 'Your Post Has Been Updated Successfully!');
 }
 
-public function delete($id){
 
-     $post= Post::findOrFail($id);
+public function delete($id)
+{
+    $post = Post::findOrFail($id);
 
-     $post->delete();
-      flash()->success('Your Post Has Been Deleted!');
-      return redirect()->route('home');
+    if ($post) {
+        $post->delete();
+        flash()->success('Your Post Has Been Deleted!');
+    }
+
+    return redirect()->route('home');
 }
+
 
 }
 
