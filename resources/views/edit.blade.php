@@ -15,6 +15,13 @@
             padding: 0.5rem 0.75rem;
             border-radius: 0.375rem;
         }
+
+        #image-preview {
+            max-width: 150px;
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -32,6 +39,13 @@
             ← Back
         </a>
     </div>
+
+    <!-- Flash Message -->
+    @if(session('success'))
+        <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <!-- Form Card -->
     <div class="bg-white shadow rounded-lg p-6">
@@ -87,7 +101,10 @@
                     Change Image
                 </label>
 
-                <input type="file" name="image" id="image" class="w-full max-w-sm">
+                <input type="file" name="image" id="image" class="w-full max-w-sm" onchange="previewImage(event)">
+
+                <!-- Preview Selected Image -->
+                <img id="image-preview" style="display:none;" alt="Image Preview">
 
                 @if($ourpost->image)
                     <div class="mt-3">
@@ -98,6 +115,11 @@
                             alt="Post Image">
                     </div>
                 @endif
+            </div>
+
+            <!-- Last Updated -->
+            <div class="text-gray-500 text-sm">
+                Last Updated: {{ $ourpost->updated_at->format('d M Y, h:i A') }}
             </div>
 
             <!-- Submit -->
@@ -113,8 +135,17 @@
     </div>
 </div>
 
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('image-preview');
+        preview.src = URL.createObjectURL(event.target.files[0]);
+        preview.style.display = 'block';
+    }
+</script>
+
 </body>
 </html>
+
 
 
 
